@@ -130,6 +130,8 @@ ALL_BINARIES = $(foreach binary, $(BINARIES) $(BINARIES_LINUX_ONLY), ./$(binary)
   $(foreach binary, $(BINARIES), output/windows_amd64/$(binary).exe)
 ALL_TARBALLS = $(foreach platform, $(PLATFORMS), $(NPD_NAME_VERSION)-$(platform).tar.gz)
 
+# Disable cgo by default to make the binary statically linked.
+CGO_ENABLED:=0
 output/windows_amd64/bin/%.exe: $(PKG_SOURCES)
 	GOOS=windows GOARCH=amd64 CGO_ENABLED=$(CGO_ENABLED) GO111MODULE=on go build \
 		-mod vendor \
@@ -196,7 +198,7 @@ else
 endif
 
 ./bin/node-problem-detector: $(PKG_SOURCES)
-	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build \
+	CGO_ENABLED=$(CGO_ENABLED) GOOS=linux GO111MODULE=on go build \
 		-mod vendor \
 		-o bin/node-problem-detector \
 		-ldflags '-X $(PKG)/pkg/version.version=$(VERSION)' \
